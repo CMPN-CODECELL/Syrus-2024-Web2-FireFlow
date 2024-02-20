@@ -2,6 +2,7 @@ import 'package:client/colors/pallete.dart';
 import 'package:client/common/gap.dart';
 import 'package:client/common/places.dart';
 import 'package:client/screens/drawer.dart';
+import 'package:client/screens/place_info.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:client/screens/speciality.dart';
 import 'package:flutter/material.dart';
@@ -178,8 +179,10 @@ class _HomeState extends State<Home> {
         ),
         child: FloatingActionButton(
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => Speciality()));
+              // Navigator.push(context,
+                  // MaterialPageRoute(builder: (context) => Speciality()));
+                  Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => PlaceInfo(locationName: "  George Everest's House ",)));
             },
             backgroundColor: Pallete.primary,
             child: const Text(
