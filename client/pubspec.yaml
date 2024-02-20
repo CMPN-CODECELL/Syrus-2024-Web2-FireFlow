@@ -39,7 +39,31 @@ dependencies:
   firebase_auth: ^4.17.4
   cloud_firestore: ^4.15.5
   curved_navigation_bar: ^1.0.3
-
+  flutter_phosphor_icons: ^0.0.1+6
+  
+  flutter_inappwebview: ^6.0.0
+  carousel_slider: ^4.2.1
+  flutter_animate: ^4.5.0
+  geolocator: ^11.0.0
+  background_location: ^0.11.8
+  flutter_dotenv: ^5.1.0
+  geocoding: ^2.1.1
+  google_maps_flutter: ^2.5.3
+  # firebase_ml_custom: 
+  tflite_flutter: ^0.10.4
+  firebase_ml_model_downloader: ^0.2.4+13
+  url_launcher: ^6.2.4
+  flutter_google_street_view: ^3.1.4
+  flutter_gemini: ^2.0.3
+  google_generative_ai: ^0.2.0
+  image_picker: ^1.0.7
+  markdown: ^7.2.1
+  fluttertoast: ^8.2.4
+  flutter_markdown: ^0.6.19
+  scrollable_positioned_list: ^0.3.8
+  simple_animations: ^5.0.2
+  google_fonts: ^6.1.0
+  
 
 dev_dependencies:
   flutter_test:
