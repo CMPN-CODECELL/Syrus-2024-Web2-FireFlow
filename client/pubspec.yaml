@@ -40,6 +40,7 @@ dependencies:
   cloud_firestore: ^4.15.5
   curved_navigation_bar: ^1.0.3
   flutter_phosphor_icons: ^0.0.1+6
+  skeletonizer: ^0.8.0
   
   flutter_inappwebview: ^6.0.0
   carousel_slider: ^4.2.1
@@ -63,6 +64,7 @@ dependencies:
   scrollable_positioned_list: ^0.3.8
   simple_animations: ^5.0.2
   google_fonts: ^6.1.0
+  flutter_gradient_animation_text: ^1.0.2
   
 
 dev_dependencies:
@@ -88,8 +90,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - assets/images/syrus_logo.png
+  assets:
+    - assets/images/syrus.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -45,7 +45,7 @@ class _LoginState extends State<Login> {
             children: <Widget>[
               Padding(
                 padding: EdgeInsets.all(8),
-                child: Image(image: AssetImage('assets/images/syrus_logo.png')),
+                child: Image(image: AssetImage('assets/images/syrus.png')),
               ),
               SizedBox(height: 20),
               Text(

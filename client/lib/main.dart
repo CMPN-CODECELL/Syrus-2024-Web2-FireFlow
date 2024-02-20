@@ -1,9 +1,13 @@
+import 'package:client/colors/pallete.dart';
 import 'package:client/firebase_options.dart';
 import 'package:client/screens/login.dart';
 import 'package:client/screens/navbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
+
+import 'package:flutter_gradient_animation_text/flutter_gradient_animation_text.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -59,12 +63,49 @@ class _SplashScreenState extends State<SplashScreen> {
     });
     return Scaffold(
       // backgroundColor: Pallete.blueprimary,
-      body: Center(
-        child: Stack(children: [
-          Container(
-            child: Text('FireFlow AI Planner'),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              GradientAnimationText(
+                text: Text(
+                  'Humsafar',
+                  style: TextStyle(
+                    fontSize: 50,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                colors: [
+                  // Color(0xFF061A9C),
+                  // Color(0xff92effd),
+                  Color(0xff8f00ff),
+                  Colors.indigo,
+                  Colors.blue,
+                  Colors.green,
+                  Colors.yellow,
+                  Colors.orange,
+                  Colors.red,
+                ],
+                duration: Duration(seconds: 5),
+                transform: GradientRotation(math.pi / 4),
+              ),
+              Container(
+                height: 450,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage(
+                      'assets/images/syrus.png', // Replace with the correct path to your image
+                    ),
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              CircularProgressIndicator(color: Pallete.textprimary),
+            ],
           ),
-        ]),
+        ),
       ),
     );
   }

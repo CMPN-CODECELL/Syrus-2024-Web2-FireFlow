@@ -3,6 +3,7 @@ import 'package:client/common/gap.dart';
 import 'package:client/common/places.dart';
 import 'package:client/screens/drawer.dart';
 import 'package:client/screens/place_info.dart';
+import 'package:client/screens/search.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:client/screens/speciality.dart';
 import 'package:flutter/material.dart';
@@ -106,6 +107,12 @@ class _HomeState extends State<Home> {
                       isSearchBarActive = value.isNotEmpty;
                       if (isSearchBarActive) {
                         // Navigate to the SearchPage when the search bar is active
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Search(initialQuery: value),
+                          ),
+                        );
                       }
                     });
                   },
@@ -152,7 +159,7 @@ class _HomeState extends State<Home> {
         child: DrawerContent(),
       ),
       body: Container(
-        color: Pallete.bgColor,
+        // color: Pallete.bgColor,
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
