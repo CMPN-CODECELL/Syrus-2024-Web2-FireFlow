@@ -2,6 +2,7 @@ import 'package:client/colors/pallete.dart';
 import 'package:client/screens/favourites.dart';
 import 'package:client/screens/home.dart';
 import 'package:client/screens/planner.dart';
+import 'package:client/screens/proPlanner.dart';
 import 'package:client/screens/profile.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
@@ -74,7 +75,7 @@ class _TabsScreenState extends State<TabsScreen>
           Icon(
             Icons.map,
             color: Pallete.whiteColor,
-          )
+          ),
         ],
       ),
     );
