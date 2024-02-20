@@ -1,9 +1,11 @@
 // import 'dart:js_interop';
 
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
+import 'package:http/http.dart' as http;
 import '../colors/pallete.dart';
 
 class PlaceInfo extends StatefulWidget {
@@ -21,6 +23,25 @@ class _PlaceInfoState extends State<PlaceInfo> {
   String locationId = "";
   double latitude = 37.7749;
   double longitude = -122.4194;
+  late String imageUrl;
+
+  Future<void> fetchImage() async {
+    final unsplashApiKey = 'buSU_UmLJboo1ASR9VjZJCImR6_SxUbweVleVFVcCBg';
+    final response = await http.get(
+      Uri.parse(
+          'https://api.unsplash.com/photos/random?query=${widget.locationName}&client_id=$unsplashApiKey'),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final urls = data['urls'];
+      setState(() {
+        imageUrl = urls['regular'];
+      });
+    } else {
+      print('Failed to load image: ${response.statusCode}');
+    }
+  }
 
   fetchInfo() async {
     final querySnapshot = await FirebaseFirestore.instance
@@ -42,17 +63,7 @@ class _PlaceInfoState extends State<PlaceInfo> {
         category = location['category'];
         description = location['description'];
         city = location['city'];
-        //  rating = (location['rating'] ?? 0).toDouble();
-        print('Rating before conversion: ${location['rating']}');
-
-        try {
-          // Use toDouble() method on 'rating' field
-          rating = (location['rating'] ?? 0).toDouble();
-        } catch (e) {
-          print('Error converting rating to double: $e');
-          // Set a default value or handle the error as needed
-          rating = 0.0;
-        }
+        rating = double.parse(location['rating']);
       });
     } else {
       throw Exception('Location not found');
@@ -65,6 +76,7 @@ class _PlaceInfoState extends State<PlaceInfo> {
 
   @override
   void initState() {
+    fetchImage();
     fetchInfo();
     super.initState();
   }
@@ -94,55 +106,117 @@ class _PlaceInfoState extends State<PlaceInfo> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Card(
-              child: Row(children: [Text(widget.locationName)]),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Card(
-              child: Row(
-                children: [Text("City:"), Text(this.city)],
+              color: Pallete.light,
+              child: Image.network(
+                imageUrl,
+                height: 180,
+                width: 250,
+                fit: BoxFit.cover,
               ),
             ),
             Card(
-              child: Row(
-                children: [
-                  IconButton(
-                      onPressed: () {
-                        _addToList();
-                      },
-                      icon: Icon(
-                        Icons.list_alt,
-                        size: 40,
-                        color: Pallete.primary,
-                      )),
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: Row(
-                      children: [
-                        IconButton(
-                            onPressed: () {},
-                            icon: Icon(
-                              Icons.star,
-                              size: 30,
-                              color: Pallete.primary,
-                            )),
-                        Padding(
-                            padding: EdgeInsetsDirectional.only(top: 10),
-                            child: Text(
-                              rating.toString(),
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 18),
-                            ))
-                      ],
+              color: Pallete.light,
+              child: Container(
+                  height: 50,
+                  child: Center(
+                      child: Text(
+                    widget.locationName,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  ))),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Card(
+              color: Pallete.light,
+              child: Container(
+                height: 30,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "City:",
+                      textAlign: TextAlign.center,
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
-                  )
+                    Text(
+                      this.city,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 20),
+                    )
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Card(
+              color: Pallete.light,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      _addToList();
+                    },
+                    style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.all(20),
+                        backgroundColor: Pallete.primary,
+                        // minimumSize: const Size(double.infinity, 0),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          side: BorderSide(color: Pallete.primary, width: 2),
+                        )),
+                    child: Text(
+                      'Add to Bucket List',
+                      style: TextStyle(color: Pallete.whiteColor),
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      IconButton(
+                          onPressed: () {},
+                          icon: Icon(
+                            Icons.star,
+                            size: 30,
+                            color: Pallete.primary,
+                          )),
+                      Padding(
+                          padding: EdgeInsetsDirectional.only(top: 10),
+                          child: Text(
+                            rating.toString(),
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 18),
+                          ))
+                    ],
+                  ),
                 ],
               ),
             ),
+            SizedBox(
+              height: 10,
+            ),
             Card(
-              child: Column(
-                children: [Text("Description:"), Text(this.description)],
+              color: Pallete.light,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Text(
+                        "Description:",
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 18),
+                      ),
+                    ),
+                    Text(this.description)
+                  ],
+                ),
               ),
             ),
           ],

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class Pallete {
   // static const Color blueprimary = Color.fromRGBO(147, 227, 223, 1);
   static const Color primary = Color.fromARGB(255, 111, 158, 131);
-
+  static const Color light =Color.fromARGB(255, 193, 235, 211);
   static const Color textprimary = Color.fromARGB(255, 0, 103, 44);
   static const Color google = Color.fromRGBO(218, 81, 66, 1);
   static const Color facebook = Color.fromRGBO(79, 106, 162, 1);

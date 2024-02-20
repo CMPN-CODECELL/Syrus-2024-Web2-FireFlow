@@ -1,0 +1,37 @@
+<div class="navbar">
+    <div class="lato-bold-italic navbar justify-content-start" >
+        <fa-icon [icon]="iconVariable" class=" ms-3 fa-2x"></fa-icon>
+        <p style="font-size: 30px; padding-top: 10px;">ItineraryPlanner</p>
+    </div>
+    <!-- <div class="navbar lato-regular">
+        <a href="" class="m-3">Home</a>
+        <a href="" class="m-3">About</a>
+        <a href="" class="m-3">Contact</a>
+    </div> -->
+    <!-- <div class="p-3" *ngIf="!isLoggedIn">
+        <button class="btn btn-dark me-3" (click)="signup()">SignUp</button>
+        <button class="btn btn-dark" (click)="login()">Login</button>
+    </div> -->
+    <!-- <div class="p-3 row"  *ngIf="isLoggedIn">
+        <div class="input-group col">
+            
+            <input type="search" id="form1" class="form-control" placeholder="search" />
+            
+          <button type="button" class="btn btn-primary" (click)="search()">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+    </div> -->
+    <!-- <div class="p-3 row" *ngIf="isLoggedIn">
+        
+        <button class="btn btn-dark me-3 col" (click)="create()">Create</button>
+    </div> -->
+    <div  *ngIf="isLoggedIn" style="display: flex; flex-direction: row; ">
+       <!-- <button > -->
+        <p class="col">{{user['username']}}</p>
+        <fa-icon [icon]="iconVariable2" class="fa-2x btn btn-dark" (click)="logout()"></fa-icon>
+    <!-- </button> -->
+        
+        
+    </div>
+</div>

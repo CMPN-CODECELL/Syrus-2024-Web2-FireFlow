@@ -182,7 +182,7 @@ class _HomeState extends State<Home> {
               // Navigator.push(context,
                   // MaterialPageRoute(builder: (context) => Speciality()));
                   Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PlaceInfo(locationName: "  George Everest's House ",)));
+                  MaterialPageRoute(builder: (context) => PlaceInfo(locationName: "  Sheesh Mahal ",)));
             },
             backgroundColor: Pallete.primary,
             child: const Text(
