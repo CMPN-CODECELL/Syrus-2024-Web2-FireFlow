@@ -51,6 +51,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              Padding(
+                padding: EdgeInsets.all(8),
+                child: Image(image: AssetImage('assets/images/syrus.png')),
+              ),
+              SizedBox(height: 20),
               Text(
                 'FireFlow, the smart AI Planne',
                 style: TextStyle(

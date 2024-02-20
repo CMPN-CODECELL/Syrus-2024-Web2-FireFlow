@@ -108,7 +108,7 @@ def get_recommendations():
         else:
             # If the input place doesn't exist, recommend based on 'Tags', 'City', or 'Ratings'
             relevant_columns = ['Tags', 'City', 'Ratings']
-            matching_locations = ['NOT Found']
+            matching_locations = ['NO Match Found']
 
             for column in relevant_columns:
                 # Get locations where the input matches the value in the specified column

@@ -4,6 +4,7 @@ import 'package:client/screens/favourites.dart';
 import 'package:client/screens/login.dart';
 import 'package:client/screens/login.dart';
 import 'package:client/screens/profile.dart';
+import 'package:client/screens/recommendation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -188,7 +189,13 @@ class _DrawerContentState extends State<DrawerContent> {
                       Text('About Us'),
                     ],
                   ),
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => RecommendationScreen()),
+                    );
+                  },
                   trailing: Icon(PhosphorIcons.caret_right),
                 ),
                 Divider(),
