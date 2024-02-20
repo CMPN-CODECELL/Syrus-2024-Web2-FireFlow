@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "170735395486",
+    "project_id": "precise-sight-372314",
+    "storage_bucket": "precise-sight-372314.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:170735395486:android:b416e970326cf3ae0fd18f",
+        "android_client_info": {
+          "package_name": "com.example.client"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSOEz_d1a3mnYmBNFzz2t8tv02HpXBcA0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'package:client/api/planner_pro_request.dart';
 import 'package:client/api/planner_request.dart';
 import 'package:client/colors/pallete.dart';
 import 'package:client/key.dart';
+import 'package:client/screens/proPlanner_output.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
@@ -67,12 +69,15 @@ class _TripPlannerProState extends State<TripPlannerPro> {
 
   String _location = 'Nagpur';
   int _numPeople = 1;
+  String _startDate = '20 February 2024';
+  String _endDate = '25 February 2024';
+
   RangeValues _budgetRange = const RangeValues(5000, 10000);
   String _duration = '1 day';
   bool _isKids = false;
 
   // Additional Fields
-  String _destination = 'Destination1';
+  String _destination = 'Mumbai';
   int _hotelRating = 1;
   String _foodType = 'Veg';
   String _transportMode = 'Bus';
@@ -123,8 +128,7 @@ class _TripPlannerProState extends State<TripPlannerPro> {
                       _destination = value!;
                     });
                   },
-                  items: ['Destination1', 'Destination2', 'Destination3']
-                      .map((destination) {
+                  items: ['Agra', 'Mumbai', 'Pune'].map((destination) {
                     return DropdownMenuItem<String>(
                       value: destination,
                       child: Text(destination),
@@ -148,6 +152,30 @@ class _TripPlannerProState extends State<TripPlannerPro> {
                   onSaved: (value) {
                     setState(() {
                       _numPeople = int.parse(value!);
+                    });
+                  },
+                ),
+                TextFormField(
+                  // keyboardType: TextInputType.num,
+                  decoration: InputDecoration(
+                    labelText: 'Start Date',
+                  ),
+
+                  onSaved: (value) {
+                    setState(() {
+                      _startDate = value!;
+                    });
+                  },
+                ),
+                TextFormField(
+                  // keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: 'End Date',
+                  ),
+
+                  onSaved: (value) {
+                    setState(() {
+                      _endDate = value!;
                     });
                   },
                 ),
@@ -280,31 +308,85 @@ class _TripPlannerProState extends State<TripPlannerPro> {
                           'foodType': _foodType,
                           'transportMode': _transportMode,
                         };
+                        String prompt = """Given the following parameters:
+  Location: $_location,
+  Number of People: $_numPeople.toInt(),
+  Budget: ${_budgetRange.start} - ${_budgetRange.end},
+  Duration: $_duration,
+  from date $_startDate to $_endDate
+  Is associated with kids: $_isKids
+  
+  Plan a detailed trip itinerary with real-time data of stay, places, and restaurants along with the budget of each activity based on the number of people. 
+  Provide the activities in the following example format:
+  hey gemini always give the same response as mention in example not a simple change in the format will be tollerated
+  For example, if I am planning a trip to Dubai for 2 days with 4 persons, the response should be:
+  strictly followed this \n new line and \n\n define start the next line leaving a line blank between
+  also give the url of images and link for hotels and flights/train/boom along with all information to reach at destination on startdate and come back on the enddate
+  
+  Day 1:\n
+  Date: {date}\n
+  Activity 1:\n
+  Start Time: {start time}\n
+  End Time: {end time}\n
+  Location: Desert Safari\n
+  Cost/Person: 100 Rs\n\n
+  
+  Activity 2:\n
+  Start Time: {start time}\n
+  End Time: {end time}\n
+  Location: Skydive Dubai\n
+  Cost/Person: 600 Rs\n\n
+  
+  Total Day Cost for day: 2800 Rs \n\n\n
 
-                        try {
-                          // Call ChatGPT API to get itineraries
-                          var response =
-                              await getTripItinerary("give me a joke");
-                          print(
-                              'ChatGPT Response: $response'); // Log the actual response
 
-                          List<String> responseList = response.split('\n\n\n');
+  Day 2:\n
+  Date: {date}\n
+  Activity 1:\n
+  Start Time: {start time}\n
+  End Time: {end time}\n
+  Location: Dubai Mall\n
+  Cost/Person: Free\n\n
+  
+  Activity 2:\n
+  Start Time: {start time}\n
+  End Time: {end time}\n
+  Location: Burj Khalifa\n
+  Cost/Person: 1200 Rs\n\n
+  
+  Total Day Cost: 2400 Rs\n\n\n
 
-                          print("This is responselist $responseList");
-                          int i = 0;
-                          List<String> dayInfoList = [];
+  Total Budget of 2 days: 5200 Rs\n
+  
+    """;
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    TileListPage(prompt: prompt)));
+                        // try {
+                        //   // Call ChatGPT API to get itineraries
+                        //   var response = await getRequest(prompt);
+                        //   print(
+                        //       'ChatGPT Response: $response'); // Log the actual response
 
-                          setState(() {
-                            _itineraries = responseList;
-                            isLoading = false;
-                          });
+                        //   List<String> responseList = response.split('\n\n\n');
 
-                          // Log the response for debugging
-                          dayInfoList.forEach(print);
-                        } catch (error) {
-                          // Handle errors when calling ChatGPT
-                          print('Error calling ChatGPT: $error');
-                        }
+                        //   print("This is responselist $responseList");
+                        //   int i = 0;
+                        //   List<String> dayInfoList = [];
+
+                        //   setState(() {
+                        //     _itineraries = responseList;
+                        //     isLoading = false;
+                        //   });
+
+                        //   // Log the response for debugging
+                        //   dayInfoList.forEach(print);
+                        // } catch (error) {
+                        //   // Handle errors when calling ChatGPT
+                        //   print('Error calling ChatGPT: $error');
+                        // }
                       }
                     },
                     child: isLoading
