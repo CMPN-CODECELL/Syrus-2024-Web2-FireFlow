@@ -101,10 +101,8 @@ class _HomeState extends State<Home> {
                 child: TextField(
                   onChanged: (value) {
                     // Update the search bar status based on input
-
                     setState(() {
                       isSearchBarActive = value.isNotEmpty;
-
                       if (isSearchBarActive) {
                         // Navigate to the SearchPage when the search bar is active
                       }
