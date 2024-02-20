@@ -163,7 +163,7 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
   void getRecommendations() async {
     final String url = 'http://10.0.2.2:5000/get_recommendations';
     final Map<String, String> headers = {'Content-Type': 'application/json'};
-    final Map<String, dynamic> data = {'location': locationController.text};
+    final Map<String, dynamic> data = {'place': locationController.text};
 
     try {
       final response = await http.post(
