@@ -43,6 +43,10 @@ class _LoginState extends State<Login> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              Padding(
+                padding: EdgeInsets.all(8),
+                child: Image(image: AssetImage('assets/images/syrus_logo.png')),
+              ),
               SizedBox(height: 20),
               Text(
                 'FireFlow, The smart AI planner',
