@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:client/api/planner_pro_request.dart';
 import 'package:client/colors/pallete.dart';
 import 'package:client/screens/navbar.dart';
@@ -19,24 +21,33 @@ class TileListPage extends StatefulWidget {
 
 class _TileListPageState extends State<TileListPage> {
   List<Tile> tiles = [];
-  String? response;
-  List<String> _itineraries = [];
+  Map<String, dynamic>? response;
+  List<dynamic> _itineraries = [];
   bool isLoading = true;
+  Map<String, dynamic> convertJsonString(String jsonString) {
+    // Remove line breaks from the JSON string
+    jsonString = jsonString.replaceAll('\n', '');
+
+    // Parse the JSON string into a JSON object
+    return json.decode(jsonString);
+  }
 
   fetchRequest() async {
     try {
       var responsetemp = await getRequest(widget.prompt);
+      var res = convertJsonString(responsetemp);
+      print("This is json ${res.runtimeType} $res");
       setState(() {
-        response = responsetemp;
+        response = res;
       });
-      print("This is responselist $response");
-      List<String> responseList = response!.split('\n\n');
+      // print("This is responselist $response");
+      // List<String> responseList = response!.split('\n\n');
 
-      int i = 0;
-      List<String> dayInfoList = [];
-
+      // int i = 0;
+      // List<String> dayInfoList = [];
+      List<dynamic> itinerary = res['itinerary'];
       setState(() {
-        _itineraries = responseList;
+        _itineraries = itinerary;
         isLoading = false;
       });
     } catch (e) {
@@ -44,8 +55,10 @@ class _TileListPageState extends State<TileListPage> {
         isLoading = false;
       });
       print("This is the error $e");
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => TabsScreen(getIndex: 3)));
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => TileListPage(prompt: widget.prompt)));
     }
   }
 
@@ -70,30 +83,76 @@ class _TileListPageState extends State<TileListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Tile List'),
-      ),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator(color: Pallete.primary))
-          : ListView.builder(
-              itemCount: _itineraries.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  selectedColor: Pallete.bgColor,
-                  iconColor: Pallete.textprimary,
-                  title: Text(_itineraries[index]),
-                  trailing: IconButton(
-                    icon: Icon(Icons.remove),
-                    onPressed: () => _subtractTile(index),
+    //   return Scaffold(
+    //     appBar: AppBar(
+    //       title: Text('Tile List'),
+    //     ),
+    //     body: isLoading
+    //         ? Center(child: CircularProgressIndicator(color: Pallete.primary))
+    //         : ListView.builder(
+    //             itemCount: _itineraries.length,
+    //             itemBuilder: (context, index) {
+    //               return ListTile(
+    //                 selectedColor: Pallete.bgColor,
+    //                 iconColor: Pallete.textprimary,
+    //                 title: Text(_itineraries[index]),
+    //                 trailing: IconButton(
+    //                   icon: Icon(Icons.remove),
+    //                   onPressed: () => _subtractTile(index),
+    //                 ),
+    //               );
+    //             },
+    //           ),
+    //     floatingActionButton: FloatingActionButton(
+    //       onPressed: _addTile,
+    //       tooltip: 'Add Tile',
+    //       child: Icon(Icons.add),
+    //     ),
+    //   );
+    // }
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Travel Itinerary'),
+        ),
+        body: ListView.builder(
+          itemCount: _itineraries.length,
+          itemBuilder: (BuildContext context, int index) {
+            Map<String, dynamic> day = response![index];
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Card(
+                  child: Column(
+                    children: [
+                      ListTile(
+                        title: Text('Hotels & Transport'),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            for (var hotel in response!['hotels'])
+                              Text('${hotel['name']} per night'),
+                            // Text(
+                            // 'Flight: ${response!['transport']['mode']} to - \$${response!['transport']['cost_per_person']} per person'),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                );
-              },
-            ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _addTile,
-        tooltip: 'Add Tile',
-        child: Icon(Icons.add),
+                ),
+                ...day['activities'].map<Widget>((activity) {
+                  return Card(
+                    child: ListTile(
+                      title: Text(activity['description']),
+                      // subtitle: Text(
+                      //     'Cost per Person: \$${activity['cost_per_person']}'),
+                    ),
+                  );
+                }).toList(),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

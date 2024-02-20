@@ -12,7 +12,7 @@ admin.initializeApp({
 const db = admin.firestore();
 
 // Path to your CSV file
-const csvFilePath = 'locations_with_geocode_and_tags.csv';
+const csvFilePath = 'locations_file (1).csv';
 
 // Function to parse CSV and write data to Firestore
 const importCSVToFirestore = () => {
@@ -21,13 +21,13 @@ const importCSVToFirestore = () => {
     .on('data', (row) => {
       // Process each row from the CSV
       const locationData = {
-        name: row['Place'],
-        description: row['Place_desc'],
+        name: row['Location'],
+        description: row['Wikipedia'],
         category: row['Category'],
-        keyword:row['Keywords'],
+        keyword:row['Tags'],
         latitude:row['Latitude'],
         longitude:row['Longitude'],
-        rating:row['Ratings'],
+        rating:row['Rating'],
         tags:row['Tags'],
         city:row['City']
       };

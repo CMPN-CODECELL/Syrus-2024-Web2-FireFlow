@@ -308,56 +308,98 @@ class _TripPlannerProState extends State<TripPlannerPro> {
                           'foodType': _foodType,
                           'transportMode': _transportMode,
                         };
-                        String prompt = """Given the following parameters:
-  Location: $_location,
-  Number of People: $_numPeople.toInt(),
-  Budget: ${_budgetRange.start} - ${_budgetRange.end},
-  Duration: $_duration,
-  from date $_startDate to $_endDate
-  Is associated with kids: $_isKids
-  
-  Plan a detailed trip itinerary with real-time data of stay, places, and restaurants along with the budget of each activity based on the number of people. 
-  Provide the activities in the following example format:
-  hey gemini always give the same response as mention in example not a simple change in the format will be tollerated
-  For example, if I am planning a trip to Dubai for 2 days with 4 persons, the response should be:
-  strictly followed this \n new line and \n\n define start the next line leaving a line blank between
-  also give the url of images and link for hotels and flights/train/boom along with all information to reach at destination on startdate and come back on the enddate
-  
-  Day 1:\n
-  Date: {date}\n
-  Activity 1:\n
-  Start Time: {start time}\n
-  End Time: {end time}\n
-  Location: Desert Safari\n
-  Cost/Person: 100 Rs\n\n
-  
-  Activity 2:\n
-  Start Time: {start time}\n
-  End Time: {end time}\n
-  Location: Skydive Dubai\n
-  Cost/Person: 600 Rs\n\n
-  
-  Total Day Cost for day: 2800 Rs \n\n\n
+                        String prompt = """Given the following parameters: User
+plane a detail trip to : $_destination from $_location for duration :$_duration days  ,number of people :${_numPeople.toInt()},mode of transport :$_transportMode, minimum budget ${_budgetRange.start},maximum budget${_budgetRange.end} ,food type $_foodType , Is associated with kids: $_isKids
+generate a complete trip day wise in which each day has number of activities
+The response shoulde be in a correct and perfect define json format with out any extra new line and spaces 
+the format of the response should be in json only 
+same as below example
 
+{
+ "transport": {
 
-  Day 2:\n
-  Date: {date}\n
-  Activity 1:\n
-  Start Time: {start time}\n
-  End Time: {end time}\n
-  Location: Dubai Mall\n
-  Cost/Person: Free\n\n
-  
-  Activity 2:\n
-  Start Time: {start time}\n
-  End Time: {end time}\n
-  Location: Burj Khalifa\n
-  Cost/Person: 1200 Rs\n\n
-  
-  Total Day Cost: 2400 Rs\n\n\n
+ "from": "NGP",
+ "to": "DXB",
+ "return": {
+  "from": "DXB",
+  "to": "NGP"
+ },
+ "mode":flights,
+ "cost_per_person": 10000,
 
-  Total Budget of 2 days: 5200 Rs\n
+ },
+ "hotels": [
+ {
+  "name": "MaxCity Hotel",
+  "price_per_night": 5000,
+
+ },
+ {
+  "name": "Burj Al Arab",
+  "price_per_night": 100000,
   
+ }
+ ],
+ "itinerary": [
+ {
+  "date": "2024-02-23",
+  "cost": 20000,
+  "food": {
+  "cost": 2000
+  },
+  "activities": [
+  {
+   "description": "Desert Safari",
+   "start_time": "",
+   "end_time": "",
+   "location": {
+   "latitude": 20.12,
+   "longitude": 80.23
+   },
+   "cost_per_person": 100
+  },
+  {
+   "description": "Skydive Dubai",
+   "start_time": "",
+   "end_time": "",
+   "location": {
+   "latitude": 20.12,
+   "longitude": 80.23
+   },
+   "cost_per_person": 600
+  }
+  ]
+ },
+ {
+  "date": "2024-02-24",
+  "cost": 0,
+  "food": {},
+  "activities": [
+  {
+   "description": "Dubai Mall",
+   "start_time": "",
+   "end_time": "",
+   "location": {
+   "latitude": 20.12,
+   "longitude": 80.23
+   },
+   "cost_per_person": 0
+  },
+  {
+   "description": "Burj Khalifa",
+   "start_time": "",
+   "end_time": "",
+   "location": {
+   "latitude": 20.12,
+   "longitude": 80.23
+   },
+   "cost_per_person": 1200
+  }
+  ]
+ }
+ ],
+ "total_budget": 5200
+}
     """;
                         Navigator.pushReplacement(
                             context,
