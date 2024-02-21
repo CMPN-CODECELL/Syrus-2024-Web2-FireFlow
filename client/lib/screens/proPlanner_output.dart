@@ -1,10 +1,12 @@
 import 'dart:convert';
-
 import 'package:client/api/planner_pro_request.dart';
-import 'package:client/colors/pallete.dart';
 import 'package:client/screens/navbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/widgets.dart';
+import 'package:http/http.dart' as http;
+import 'package:client/colors/pallete.dart';
 import 'package:flutter/material.dart';
 
 class Tile {
@@ -23,6 +25,7 @@ class TileListPage extends StatefulWidget {
 
 class _TileListPageState extends State<TileListPage> {
   List<Tile> tiles = [];
+  List<dynamic> suggestions = [];
   String? response;
   List<dynamic> _itineraries = [];
   bool isLoading = true;
@@ -58,7 +61,36 @@ class _TileListPageState extends State<TileListPage> {
   @override
   void initState() {
     fetchRequest();
+    fetchRestaurantSuggestions();
     super.initState();
+  }
+
+  Future<void> fetchRestaurantSuggestions() async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://127.0.0.1:5000/suggest_restaurants'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'lat': 18.5204,
+          'lon': 73.8567,
+          'cuisine': 'Chinese',
+          'num': 3,
+        }),
+      );
+      print("This is api response $response");
+
+      if (response.statusCode == 200) {
+        setState(() {
+          suggestions = jsonDecode(response.body);
+        });
+      } else {
+        throw Exception('Failed to load restaurant suggestions');
+      }
+    } catch (e) {
+      print('This is the error $e');
+    }
   }
 
   void _addTile() {
@@ -123,18 +155,31 @@ class _TileListPageState extends State<TileListPage> {
           child: Column(
             children: [
               Container(
-                height: MediaQuery.of(context).size.height * 0.8,
+                height: MediaQuery.of(context).size.height * 0.6,
                 padding: EdgeInsets.all(8),
                 child: TextField(
                   controller: _controller,
                   maxLines: null, // Allows unlimited lines
                   keyboardType: TextInputType.multiline,
-
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Pallete.primary.withOpacity(0.2),
                     border: OutlineInputBorder(),
                   ),
+                ),
+              ),
+              Container(
+                height: 120,
+                // Replace SizedBox with Expanded
+                child: ListView.builder(
+                  itemCount: suggestions.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(suggestions[index]['name']),
+                      subtitle: Text(suggestions[index]['cuisine']),
+                      // Add more information from the response as needed
+                    );
+                  },
                 ),
               ),
               ElevatedButton(

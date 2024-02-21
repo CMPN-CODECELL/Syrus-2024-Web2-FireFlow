@@ -70,6 +70,7 @@ import google.generativeai as genai
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
+from math import radians, sin, cos, sqrt, atan2
 
 
 app = Flask(__name__)
@@ -90,6 +91,54 @@ df = pd.read_csv('Backend/locations_with_geocode_and_tags.csv')
 
 # # # Dictionary to store recommendations for each location
 # # recommendations_dict = {}
+
+# Load the CSV file into a DataFrame
+df1 = pd.read_csv('Backend/restaurant_data.csv')
+
+# Function to calculate distance between two coordinates using Haversine formula
+def haversine(lat1, lon1, lat2, lon2):
+    R = 6371.0  # Earth radius in kilometers
+
+    # Convert latitude and longitude from degrees to radians
+    lat1_rad = radians(lat1)
+    lon1_rad = radians(lon1)
+    lat2_rad = radians(lat2)
+    lon2_rad = radians(lon2)
+
+    # Calculate the change in coordinates
+    dlon = lon2_rad - lon1_rad
+    dlat = lat2_rad - lat1_rad
+
+    # Calculate the Haversine formula
+    a = sin(dlat / 2)**2 + cos(lat1_rad) * cos(lat2_rad) * sin(dlon / 2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    distance = R * c
+
+    return distance
+
+# Function to suggest restaurants based on location and type of food
+def suggest_restaurants(lat, lon, cuisine, num_restaurants=3):
+    df1['distance'] = df1.apply(lambda row: haversine(lat, lon, float(row['location_latitude']), float(row['location_longitude'])), axis=1)
+    filtered_df = df1[(df1['cuisine'].str.contains(cuisine, case=False))]
+    sorted_df = filtered_df.sort_values(by='distance')
+    suggested_restaurants = sorted_df.head(min(num_restaurants, len(sorted_df)))
+    return suggested_restaurants[['name', 'cuisine', 'aggregate_rating', 'cost_for_two', 'distance']]
+
+@app.route('/suggest_restaurants', methods=['POST'])
+def suggest_restaurants_api():
+    try:
+        data = request.get_json()
+        lat = data.get('lat')
+        lon = data.get('lon')
+        cuisine = data.get('cuisine')
+        num_suggestions = data.get('num', 3)
+        
+        suggestions = suggest_restaurants(lat, lon, cuisine, num_suggestions)
+        
+        return jsonify({'restaurants': suggestions.to_dict(orient='records')})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
 
 @app.route('/get_recommendations', methods=['POST'])
 def get_recommendations():
