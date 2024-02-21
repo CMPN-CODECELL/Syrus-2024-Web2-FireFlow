@@ -181,7 +181,6 @@ class _ImageCamState extends State<ImageCam> {
                   child: TextField(
                     controller: _textController,
                     decoration: InputDecoration(
-                      hintText: "Type your Prompt..",
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0),
                           borderSide: BorderSide.none),
