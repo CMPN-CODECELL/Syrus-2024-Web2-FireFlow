@@ -1,0 +1,44 @@
+<app-navbar></app-navbar>
+<form
+  action=""
+  class="form-group d-flex flex-column w-25 m-2"
+  [formGroup]="placeForm"
+>
+  <input type="text" class="m-2" placeholder="name" formControlName="name" />
+  <input
+    type="text"
+    class="m-2"
+    placeholder="category"
+    formControlName="category"
+  />
+  <input
+    type="text"
+    class="m-2"
+    placeholder="latitude"
+    formControlName="latitude"
+  />
+  <input
+    type="text"
+    class="m-2"
+    placeholder="longitude"
+    formControlName="longitude"
+  />
+  <input
+    type="text"
+    class="m-2"
+    placeholder="description"
+    formControlName="description"
+  />
+  <input type="text" class="m-2" placeholder="city" formControlName="city" />
+  <input type="text" class="m-2" placeholder="tags" formControlName="tags" />
+  <input
+    type="text"
+    class="m-2"
+    placeholder="keywords"
+    formControlName="keywords"
+  />
+  <button type="button" class="m-2" class="btn btn-success" (click)="submit()">
+    Submit
+  </button>
+</form>
+<app-footer></app-footer>

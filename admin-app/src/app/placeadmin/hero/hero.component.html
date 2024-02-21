@@ -1,1 +1,53 @@
-<p>hero works!</p>
+<app-navbar></app-navbar>
+<div class="d-flex flex-column">
+  <div class="row justify-content-around">
+    <div class="col-2">
+      <p>Users:</p>
+      <p>80</p>
+    </div>
+    <div class="col-2">
+      <p>Unverified Places</p>
+      <p>15</p>
+    </div>
+    <div class="col-2">
+      <p>Verified Places</p>
+      <p>1000</p>
+    </div>
+    <div class="col-2">
+      <button class="btn btn-success m-4" [routerLink]="['/addPlace']">
+        Add place
+      </button>
+    </div>
+  </div>
+  <div>
+    <table style="width: 90vw" class="m-4">
+      <tr>
+        <th>Sr. no.</th>
+        <th>Name</th>
+
+        <th>City</th>
+        <th>Category</th>
+        <th>Description</th>
+        <th>latitude</th>
+        <th>longitude</th>
+        <th>Verification</th>
+      </tr>
+      <tr *ngFor="let place of unverified; index as i">
+        <th>{{ i + 1 }}</th>
+        <th>{{ place.name }}</th>
+
+        <th>{{ place.city }}</th>
+        <th>{{ place.category }}</th>
+        <th>{{ place.description }}</th>
+        <th>{{ place.latitude }}</th>
+        <th>{{ place.longitude }}</th>
+        <th>
+          <button class="btn btn-success" (click)="submit(place.id, i)">
+            Verify
+          </button>
+        </th>
+      </tr>
+    </table>
+  </div>
+</div>
+<app-footer></app-footer>
