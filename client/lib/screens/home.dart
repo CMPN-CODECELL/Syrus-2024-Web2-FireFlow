@@ -2,11 +2,15 @@ import 'package:client/colors/pallete.dart';
 import 'package:client/common/gap.dart';
 import 'package:client/common/places.dart';
 import 'package:client/screens/calendar.dart';
+import 'package:client/screens/community_planner.dart';
 import 'package:client/screens/drawer.dart';
 import 'package:client/screens/festivals.dart';
 import 'package:client/screens/maps.dart';
+import 'package:client/screens/my_itinerary.dart';
 import 'package:client/screens/search.dart';
 import 'package:client/screens/speciality.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 
@@ -20,6 +24,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   bool isSearchBarActive = false;
   bool _loading = false;
+
   @override
   Widget build(BuildContext context) {
     // Define your data for each category
@@ -129,7 +134,7 @@ class _HomeState extends State<Home> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => Calendar()),
+                    MaterialPageRoute(builder: (context) => MyWidget()),
                   );
                 },
                 icon: Icon(
@@ -147,7 +152,7 @@ class _HomeState extends State<Home> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => Maps()),
+                    MaterialPageRoute(builder: (context) => Cplanner()),
                   );
                 },
                 icon: Icon(
@@ -196,7 +201,7 @@ class _HomeState extends State<Home> {
             },
             backgroundColor: Pallete.primary,
             child: const Text(
-              'Speciality of Maharashtra',
+              'Festivals of Inida',
               style: TextStyle(color: Pallete.whiteColor),
             )),
       ),

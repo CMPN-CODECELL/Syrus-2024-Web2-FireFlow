@@ -30,7 +30,7 @@ class _PlaceInfoState extends State<PlaceInfo> {
   late String imageUrl;
   double predefinedLocationLat = 37.7749;
   double predefinedLocationLong = -122.4194;
-  final double radius = 1000;
+  final double radius = 10000;
   double _rating = 0;
   String _review = '';
   bool _isButtonEnabled = false;
@@ -113,18 +113,31 @@ class _PlaceInfoState extends State<PlaceInfo> {
 
   _checkIfVisited() async {
     String userId = FirebaseAuth.instance.currentUser!.uid;
-    var visitedCollection = FirebaseFirestore.instance
-        .collection('users')
-        .doc(userId)
-        .collection('visited');
-    var querySnapshot = await visitedCollection.doc(locationId).get();
+    try {
+      var visitedCollection = FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('visited');
+      var querySnapshot = await visitedCollection.doc(locationId).get();
 
-    if (!querySnapshot.exists) {
+      if (!querySnapshot.exists) {
+        _initBackgroundLocation();
+      }
+    } catch (e) {
       _initBackgroundLocation();
     }
   }
 
   Future<void> _initBackgroundLocation() async {
+    var permission = await Geolocator.checkPermission();
+    print('the permission is $permission');
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever ||
+        permission == LocationPermission.unableToDetermine) {
+      await Geolocator.requestPermission().catchError((error) {
+        print("error: $error");
+      });
+    }
     await BackgroundLocation.startLocationService();
     // await BackgroundLocation.startLocationUpdates();
     BackgroundLocation.getLocationUpdates((location) {
@@ -196,6 +209,7 @@ class _PlaceInfoState extends State<PlaceInfo> {
       predefinedLocationLat,
       predefinedLocationLong,
     );
+    print("The distance is $distance");
 
     if (distance <= radius) {
       BackgroundLocation.stopLocationService();

@@ -27,7 +27,7 @@ import 'package:flutter/services.dart';
 //   var _response;
 //   final String apiUrl =
 //       'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GPTKey.GapiKey}';
-//   final Map<String, String> headers = {'Content-Type': 'application/json'};
+//   final Map<String, String> headers = {'Content-Type': 'application/'};
 
 //   try {
 //     var query = {
@@ -311,95 +311,96 @@ class _TripPlannerProState extends State<TripPlannerPro> {
                         String prompt = """Given the following parameters: User
 plane a detail trip to : $_destination from $_location for duration :$_duration days  ,number of people :${_numPeople.toInt()},mode of transport :$_transportMode, minimum budget ${_budgetRange.start},maximum budget${_budgetRange.end} ,food type $_foodType , Is associated with kids: $_isKids
 generate a complete trip day wise in which each day has number of activities
-The response shoulde be in a correct and perfect define json format with out any extra new line and spaces 
-the format of the response should be in json only 
+The response shoulde be in a correct and perfect define  format with out any extra new line and spaces 
+the format of the response should be in  only 
 same as below example
 
-{
- "transport": {
+  Give the response in the below pattern only \n refers to next line  \n\n refers to skip the next line
 
- "from": "NGP",
- "to": "DXB",
- "return": {
-  "from": "DXB",
-  "to": "NGP"
- },
- "mode":flights,
- "cost_per_person": 10000,
+flights info 
+ Form:ngp  airport \n
+  to:Dubai airport \n
+return flights\n
+ From:dubai airport \n
+ to: nagpur airport \n\n
 
- },
- "hotels": [
- {
-  "name": "MaxCity Hotel",
-  "price_per_night": 5000,
+flight to cost: 10000    \n
+booking links: {}   \n\n
 
- },
- {
-  "name": "Burj Al Arab",
-  "price_per_night": 100000,
+Stay Hotels Option \n\n
+
+  Option 1:\n
+    Hotel name: MaxCity Hotel  \n
+    Price:5000/day    \n
+    Booking Link:{} \n\n
+
+  Option 2:\n
+    Hotel name:Burj Arab\n
+    Price: 100000/day   \n
+ 
+
+
+
+   Booking Link:{} \n\n
+
+Trip Itineraries day wise:\n\n
+ 
+Day 1:\n\n
+
+Date:23/2/24    \n
+Total cost for Day: 20000   \n
+Food:\n
+  details for whole day : \n
+  Cost: 2000 rs   \n\n
+
   
- }
- ],
- "itinerary": [
- {
-  "date": "2024-02-23",
-  "cost": 20000,
-  "food": {
-  "cost": 2000
-  },
-  "activities": [
-  {
-   "description": "Desert Safari",
-   "start_time": "",
-   "end_time": "",
-   "location": {
-   "latitude": 20.12,
-   "longitude": 80.23
-   },
-   "cost_per_person": 100
-  },
-  {
-   "description": "Skydive Dubai",
-   "start_time": "",
-   "end_time": "",
-   "location": {
-   "latitude": 20.12,
-   "longitude": 80.23
-   },
-   "cost_per_person": 600
-  }
-  ]
- },
- {
-  "date": "2024-02-24",
-  "cost": 0,
-  "food": {},
-  "activities": [
-  {
-   "description": "Dubai Mall",
-   "start_time": "",
-   "end_time": "",
-   "location": {
-   "latitude": 20.12,
-   "longitude": 80.23
-   },
-   "cost_per_person": 0
-  },
-  {
-   "description": "Burj Khalifa",
-   "start_time": "",
-   "end_time": "",
-   "location": {
-   "latitude": 20.12,
-   "longitude": 80.23
-   },
-   "cost_per_person": 1200
-  }
-  ]
- }
- ],
- "total_budget": 5200
-}
+  Day 1:\n
+  Date: {date}\n
+ Activity 1:\n 
+Description best desert of dubai    \n
+  Start Time: {start time}\n
+  End Time: {end time}\n
+  Location: Desert Safari\n
+   Latitute :20.12\n
+  longitude:80.23\n
+  Cost/Person: 100 Rs\n\n
+  
+  Activity 2:\n
+  Description best desert of dubai    \n
+  Start Time: {start time}\n
+  End Time: {end time}\n
+  Location: Skydive Dubai\n
+    Latitute :20.12\n
+  longitude:80.23\n
+  Cost/Person: 600 Rs\n\n
+  
+  Total Day Cost for day1: 2800 Rs \n\n\n
+
+
+  Day 2:\n
+  Date: {date}\n
+  Activity 1:\n
+ Description best desert of dubai    \n
+  Start Time: {start time}\n
+  End Time: {end time}\n
+  Location: Dubai Mall\n
+   Latitute :20.12\n
+  longitude:80.23\n
+  Cost/Person: Free\n\n
+  
+  Activity 2:\n
+ Description best desert of dubai    \n
+  Start Time: {start time}\n
+  End Time: {end time}\n
+  Location: Burj Khalifa\n
+   Latitute :20.12\n
+  longitude:80.23\n
+  Cost/Person: 1200 Rs\n\n
+  
+  Total Day 2Cost: 2400 Rs\n\n\n
+
+  Total Budget of 2 days: 5200 Rs\n
+
     """;
                         Navigator.pushReplacement(
                             context,

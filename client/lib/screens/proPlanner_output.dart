@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:client/api/planner_pro_request.dart';
 import 'package:client/colors/pallete.dart';
 import 'package:client/screens/navbar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Tile {
@@ -21,35 +23,26 @@ class TileListPage extends StatefulWidget {
 
 class _TileListPageState extends State<TileListPage> {
   List<Tile> tiles = [];
-  Map<String, dynamic>? response;
+  String? response;
   List<dynamic> _itineraries = [];
   bool isLoading = true;
+  TextEditingController _controller = TextEditingController();
+
   Map<String, dynamic> convertJsonString(String jsonString) {
-    // Remove line breaks from the JSON string
     jsonString = jsonString.replaceAll('\n', '');
 
-    // Parse the JSON string into a JSON object
     return json.decode(jsonString);
   }
 
   fetchRequest() async {
     try {
       var responsetemp = await getRequest(widget.prompt);
-      var res = convertJsonString(responsetemp);
-      print("This is json ${res.runtimeType} $res");
+      print("This is json $responsetemp");
       setState(() {
-        response = res;
-      });
-      // print("This is responselist $response");
-      // List<String> responseList = response!.split('\n\n');
-
-      // int i = 0;
-      // List<String> dayInfoList = [];
-      List<dynamic> itinerary = res['itinerary'];
-      setState(() {
-        _itineraries = itinerary;
+        response = responsetemp;
         isLoading = false;
       });
+      _controller = TextEditingController(text: response);
     } catch (e) {
       setState(() {
         isLoading = false;
@@ -81,79 +74,94 @@ class _TileListPageState extends State<TileListPage> {
     });
   }
 
+  void saveItineraryToCollection(String userId, String itineraryText) async {
+    try {
+      // Get a reference to the Firestore collection
+      CollectionReference itineraries =
+          FirebaseFirestore.instance.collection('itineraries');
+
+      // Add a new document with a generated ID
+      await itineraries.add({
+        'userId': userId,
+        'itineraryText': itineraryText,
+      });
+
+      print('Itinerary saved successfully!');
+    } catch (e) {
+      print('Error saving itinerary: $e');
+    }
+  }
+
+  void _saveItinerary() {
+    // Extract text from the TextField
+    String itineraryText = _controller.text;
+
+    // Save the itinerary to the "itineraries" collection
+    // Along with the current user ID
+    String userId = FirebaseAuth.instance.currentUser!
+        .uid; // You need to implement getCurrentUserId function
+    saveItineraryToCollection(userId, itineraryText);
+
+    // Optionally, you can show a snackbar or navigate to another screen
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Itinerary saved successfully')),
+    );
+    Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (context) => TabsScreen(getIndex: 3)));
+  }
+
   @override
   Widget build(BuildContext context) {
-    //   return Scaffold(
-    //     appBar: AppBar(
-    //       title: Text('Tile List'),
-    //     ),
-    //     body: isLoading
-    //         ? Center(child: CircularProgressIndicator(color: Pallete.primary))
-    //         : ListView.builder(
-    //             itemCount: _itineraries.length,
-    //             itemBuilder: (context, index) {
-    //               return ListTile(
-    //                 selectedColor: Pallete.bgColor,
-    //                 iconColor: Pallete.textprimary,
-    //                 title: Text(_itineraries[index]),
-    //                 trailing: IconButton(
-    //                   icon: Icon(Icons.remove),
-    //                   onPressed: () => _subtractTile(index),
-    //                 ),
-    //               );
-    //             },
-    //           ),
-    //     floatingActionButton: FloatingActionButton(
-    //       onPressed: _addTile,
-    //       tooltip: 'Add Tile',
-    //       child: Icon(Icons.add),
-    //     ),
-    //   );
-    // }
-    return MaterialApp(
-      home: Scaffold(
+    if (isLoading) {
+      return Center(child: CircularProgressIndicator(color: Pallete.primary));
+    } else {
+      return Scaffold(
         appBar: AppBar(
           title: Text('Travel Itinerary'),
         ),
-        body: ListView.builder(
-          itemCount: _itineraries.length,
-          itemBuilder: (BuildContext context, int index) {
-            Map<String, dynamic> day = response![index];
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Card(
-                  child: Column(
-                    children: [
-                      ListTile(
-                        title: Text('Hotels & Transport'),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            for (var hotel in response!['hotels'])
-                              Text('${hotel['name']} per night'),
-                            // Text(
-                            // 'Flight: ${response!['transport']['mode']} to - \$${response!['transport']['cost_per_person']} per person'),
-                          ],
-                        ),
-                      ),
-                    ],
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                height: MediaQuery.of(context).size.height * 0.8,
+                padding: EdgeInsets.all(8),
+                child: TextField(
+                  controller: _controller,
+                  maxLines: null, // Allows unlimited lines
+                  keyboardType: TextInputType.multiline,
+
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Pallete.primary.withOpacity(0.2),
+                    border: OutlineInputBorder(),
                   ),
                 ),
-                ...day['activities'].map<Widget>((activity) {
-                  return Card(
-                    child: ListTile(
-                      title: Text(activity['description']),
-                      // subtitle: Text(
-                      //     'Cost per Person: \$${activity['cost_per_person']}'),
-                    ),
-                  );
-                }).toList(),
-              ],
-            );
-          },
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Pallete.whiteColor,
+                  backgroundColor: Pallete.primary, // Text color
+                  padding: const EdgeInsets.all(20),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                  elevation: 5,
+                  //minimumSize: Size(double.infinity, 0), // Full width
+                ),
+                onPressed: _saveItinerary,
+                child: Container(
+                  width: double.infinity,
+                  alignment: Alignment.center,
+                  child: Text(
+                    'Save This Itinerary',
+                    style: TextStyle(color: Pallete.whiteColor),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 }

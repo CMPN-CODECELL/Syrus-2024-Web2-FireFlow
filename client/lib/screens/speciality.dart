@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:client/colors/pallete.dart';
+import 'package:client/screens/street_view.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -35,13 +35,13 @@ class _SpecialityMhState extends State<SpecialityMh> {
       if (selectedCity == "All") {
         // Fetch all festivals if no city is selected
         festivals =
-            FirebaseFirestore.instance.collection('festivals').snapshots();
+            FirebaseFirestore.instance.collection('festivals_more').snapshots();
       } else {
         // Fetch festivals based on the selected city
 
         festivals = FirebaseFirestore.instance
-            .collection('festivals')
-            .where('category', isEqualTo: selectedCity)
+            .collection('festivals_more')
+            .where('regionsCelebrated', isEqualTo: selectedCity)
             .snapshots();
       }
     });
@@ -52,7 +52,7 @@ class _SpecialityMhState extends State<SpecialityMh> {
 
     for (var doc in snapshot.docs) {
       var festivalData = doc.data() as Map<String, dynamic>;
-      var regionsCelebrated = festivalData['category'];
+      var regionsCelebrated = festivalData['regionsCelebrated'];
       cities.add(regionsCelebrated);
     }
 
@@ -63,14 +63,15 @@ class _SpecialityMhState extends State<SpecialityMh> {
   void initState() {
     super.initState();
     fetchdata();
-    festivals = FirebaseFirestore.instance.collection('festivals').snapshots();
+    festivals =
+        FirebaseFirestore.instance.collection('festivals_more').snapshots();
 
     // Fetch cities and update the dropdown list
     festivals.listen((QuerySnapshot snapshot) {
       List<String> newCities = ['All'];
       for (var doc in snapshot.docs) {
         var festivalData = doc.data() as Map<String, dynamic>;
-        var regionsCelebrated = festivalData['category'];
+        var regionsCelebrated = festivalData['regionsCelebrated'];
         if (!newCities.contains(regionsCelebrated)) {
           newCities.add(regionsCelebrated);
         }
@@ -228,8 +229,16 @@ class DetailPage extends StatelessWidget {
                   onPressed: () async {
                     // Implement the logic to convert place into coordinates
                     // and mark it on the map
-                    final coordinates = await _getCoordinatesFromAddress(place);
-                    _markPlaceOnMap(context, place, coordinates);
+                    var coordinates = await _getCoordinatesFromAddress(place);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => StreetViewPanoramaInitDemo(
+                                place: place,
+                                lat: coordinates.first.latitude,
+                                long: coordinates.first.longitude,
+                                rating: 4.5)));
+                    // _markPlaceOnMap(context, place, coordinates);
                   },
                   child: Text(place),
                 ),
