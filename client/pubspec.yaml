@@ -41,6 +41,12 @@ dependencies:
   curved_navigation_bar: ^1.0.3
   flutter_phosphor_icons: ^0.0.1+6
   skeletonizer: ^0.8.0
+
+  http: ^1.2.0
+  google_gemini: ^0.1.2
+  
+  camera: ^0.10.5+9
+  permission_handler: ^11.2.0
   
   flutter_inappwebview: ^6.0.0
   carousel_slider: ^4.2.1
@@ -66,6 +72,11 @@ dependencies:
   google_fonts: ^6.1.0
   flutter_gradient_animation_text: ^1.0.2
   webview_flutter: ^4.7.0
+  # rating_bar: ^1.0.2
+  flutter_rating_bar: ^4.0.1
+  table_calendar: ^3.1.0
+  intl: ^0.19.0
+  cached_network_image: ^3.3.1
   
 
 dev_dependencies:

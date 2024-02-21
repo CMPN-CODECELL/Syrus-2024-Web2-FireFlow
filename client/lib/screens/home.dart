@@ -1,10 +1,15 @@
+import 'dart:convert';
+
 import 'package:client/colors/pallete.dart';
 import 'package:client/common/gap.dart';
 import 'package:client/common/places.dart';
+import 'package:client/screens/add_place.dart';
+import 'package:client/screens/addplace.dart';
 import 'package:client/screens/calendar.dart';
 import 'package:client/screens/community_planner.dart';
 import 'package:client/screens/drawer.dart';
 import 'package:client/screens/festivals.dart';
+import 'package:client/screens/imagecam.dart';
 import 'package:client/screens/maps.dart';
 import 'package:client/screens/my_itinerary.dart';
 import 'package:client/screens/search.dart';
@@ -13,6 +18,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
+
+import 'package:http/http.dart' as http;
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -176,7 +183,22 @@ class _HomeState extends State<Home> {
             child: Column(
                 // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Gap(),
+                  // Camera Icon (New) below AppBar
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ImageCam()));
+                      },
+                      icon: Icon(
+                        Icons.camera_alt,
+                        size: 30,
+                      ),
+                    ),
+                  ),
                   CategoryCard(title: "Peace", places: peacePlaces),
                   Gap(),
                   CategoryCard(title: "Explore", places: explorePlaces),
@@ -189,21 +211,62 @@ class _HomeState extends State<Home> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Container(
-        width: 250,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: FloatingActionButton(
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => SpecialityMh()));
-            },
-            backgroundColor: Pallete.primary,
-            child: const Text(
-              'Festivals of Inida',
-              style: TextStyle(color: Pallete.whiteColor),
-            )),
+      floatingActionButton: Row(
+        children: [
+          SizedBox(
+            width: 20,
+          ),
+          Container(
+            width: 150,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: FloatingActionButton(
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => SpecialityMh()));
+                },
+                backgroundColor: Pallete.primary,
+                child: const Text(
+                  'Festivals of Inida',
+                  style: TextStyle(color: Pallete.whiteColor),
+                )),
+          ),
+          SizedBox(
+            width: 20,
+          ),
+          Container(
+            width: 150,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: FloatingActionButton(
+                onPressed: () async {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AddPlace()),
+                  );
+                  // final response = await http.post(
+                  //   Uri.parse('http://127.0.0.1:5000/suggest_restaurants'),
+                  //   headers: {
+                  //     'Content-Type': 'application/json',
+                  //   },
+                  //   body: jsonEncode({
+                  //     "lat": "18.5204",
+                  //     "lon": "73.8567",
+                  //     "cuisine": "Chinese",
+                  //     "num": "3",
+                  //   }),
+                  // );
+                  // print("This is api response $response");
+                },
+                backgroundColor: Pallete.primary,
+                child: const Text(
+                  'Add a Place',
+                  style: TextStyle(color: Pallete.whiteColor),
+                )),
+          )
+        ],
       ),
     );
   }

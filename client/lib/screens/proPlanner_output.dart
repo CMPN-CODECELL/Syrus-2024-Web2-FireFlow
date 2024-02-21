@@ -17,8 +17,10 @@ class Tile {
 }
 
 class TileListPage extends StatefulWidget {
-  const TileListPage({Key? key, required this.prompt}) : super(key: key);
+  const TileListPage({Key? key, required this.prompt, required this.userInput})
+      : super(key: key);
   final String prompt;
+  final Map<String, dynamic> userInput;
   @override
   _TileListPageState createState() => _TileListPageState();
 }
@@ -54,7 +56,10 @@ class _TileListPageState extends State<TileListPage> {
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (context) => TileListPage(prompt: widget.prompt)));
+              builder: (context) => TileListPage(
+                    prompt: widget.prompt,
+                    userInput: widget.userInput,
+                  )));
     }
   }
 
@@ -67,22 +72,26 @@ class _TileListPageState extends State<TileListPage> {
 
   Future<void> fetchRestaurantSuggestions() async {
     try {
+      setState(() {
+        isLoading = true;
+      });
       final response = await http.post(
         Uri.parse('http://127.0.0.1:5000/suggest_restaurants'),
         headers: {
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          'lat': 18.5204,
-          'lon': 73.8567,
-          'cuisine': 'Chinese',
-          'num': 3,
+          "lat": "18.5204",
+          "lon": "73.8567",
+          "cuisine": "Chinese",
+          "num": "3",
         }),
       );
       print("This is api response $response");
 
       if (response.statusCode == 200) {
         setState(() {
+          isLoading = false;
           suggestions = jsonDecode(response.body);
         });
       } else {
@@ -116,6 +125,15 @@ class _TileListPageState extends State<TileListPage> {
       await itineraries.add({
         'userId': userId,
         'itineraryText': itineraryText,
+        'location': widget.userInput['location'],
+        'destination': widget.userInput['destination'],
+        'numPeople': widget.userInput['numPeople'],
+        'budgetRange': widget.userInput['budgetRange'],
+        'duration': widget.userInput['duration'],
+        'isKids': widget.userInput['isKids'],
+        'hotelRating': widget.userInput['hotelRating'],
+        'foodType': widget.userInput['foodType'],
+        'transportMode': widget.userInput['transportMode'],
       });
 
       print('Itinerary saved successfully!');

@@ -1,3 +1,4 @@
+import 'package:client/screens/add_place.dart';
 import 'package:client/screens/addplace.dart';
 import 'package:client/screens/login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

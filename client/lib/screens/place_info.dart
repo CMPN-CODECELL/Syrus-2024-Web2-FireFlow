@@ -7,6 +7,7 @@ import 'package:client/screens/street_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
@@ -35,9 +36,10 @@ class _PlaceInfoState extends State<PlaceInfo> {
   String _review = '';
   bool _isButtonEnabled = false;
   var location;
+  late String locationName;
 
   Future<void> fetchImage() async {
-    final unsplashApiKey = 'buSU_UmLJboo1ASR9VjZJCImR6_SxUbweVleVFVcCBg';
+    const unsplashApiKey = 'buSU_UmLJboo1ASR9VjZJCImR6_SxUbweVleVFVcCBg';
     final response = await http.get(
       Uri.parse(
           'https://api.unsplash.com/photos/random?query=${widget.locationName}&client_id=$unsplashApiKey'),
@@ -66,7 +68,7 @@ class _PlaceInfoState extends State<PlaceInfo> {
     }
     final querySnapshot = await FirebaseFirestore.instance
         .collection('location')
-        .where("name", isEqualTo: widget.locationName)
+        .where("name", isEqualTo: locationName)
         .get();
 
     if (querySnapshot.docs.isNotEmpty) {
@@ -88,7 +90,7 @@ class _PlaceInfoState extends State<PlaceInfo> {
     } else {
       throw Exception('Location not found');
     }
-    var locationtemp = await _getCoordinatesFromAddress(widget.locationName);
+    var locationtemp = await _getCoordinatesFromAddress(locationName);
     setState(() {
       location = locationtemp;
     });
@@ -103,12 +105,16 @@ class _PlaceInfoState extends State<PlaceInfo> {
     }
   }
 
+  List<Map<String, String>> recommendations = [];
+
   @override
   void initState() {
     fetchImage();
+    locationName = widget.locationName;
     fetchInfo();
     _checkIfVisited();
     super.initState();
+    getRecommendations(locationName);
   }
 
   _checkIfVisited() async {
@@ -139,7 +145,7 @@ class _PlaceInfoState extends State<PlaceInfo> {
       });
     }
     await BackgroundLocation.startLocationService();
-    // await BackgroundLocation.startLocationUpdates();
+
     BackgroundLocation.getLocationUpdates((location) {
       _checkLocationAndShowAlert(location.latitude!, location.longitude!);
     });
@@ -211,7 +217,7 @@ class _PlaceInfoState extends State<PlaceInfo> {
     );
     print("The distance is $distance");
 
-    if (distance <= radius) {
+    if (distance <= 100000000) {
       BackgroundLocation.stopLocationService();
       showDialog(
         context: context,
@@ -223,22 +229,25 @@ class _PlaceInfoState extends State<PlaceInfo> {
               'Rate it',
               style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
             ),
-            Row(
-              children: List.generate(5, (index) {
-                return IconButton(
-                  icon: Icon(
-                    index < _rating.floor() ? Icons.star : Icons.star_border,
-                    color: Pallete.primary,
-                    size: 20.0,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _rating = index + 1.0;
-                      _isButtonEnabled = true;
-                    });
-                  },
-                );
-              }),
+            SingleChildScrollView(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: List.generate(5, (index) {
+                  return IconButton(
+                    icon: Icon(
+                      index < _rating.floor() ? Icons.star : Icons.star_border,
+                      color: Pallete.primary,
+                      size: 15.0,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _rating = index + 1.0;
+                        _isButtonEnabled = true;
+                      });
+                    },
+                  );
+                }),
+              ),
             ),
             SizedBox(height: 20.0),
             TextField(
@@ -270,170 +279,295 @@ class _PlaceInfoState extends State<PlaceInfo> {
         FirebaseFirestore.instance.collection('users').doc(userId);
     CollectionReference bucketCollectionRef = userRef.collection('bucket');
 
-    await bucketCollectionRef.doc(widget.locationName).set({
+    await bucketCollectionRef.doc(locationName).set({
       'LocationId': this.locationId,
-      'LocationName': widget.locationName,
+      'LocationName': locationName,
       'LocationCity': city,
       'LocationRating': rating,
     });
+  }
+
+  Future<void> getRecommendations(String location) async {
+    print('getRecommendations called for location: $location'); // Debug print
+
+    final String url = 'http://10.0.2.2:5000/get_recommendations';
+    final Map<String, String> headers = {'Content-Type': 'application/json'};
+    final Map<String, dynamic> data = {'place': location};
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: headers,
+        body: jsonEncode(data),
+      );
+
+      print('Server Response: ${response.body}'); // Debug print
+
+      if (response.statusCode == 200) {
+        setState(() {
+          recommendations =
+              (jsonDecode(response.body)['recommendations'] as List)
+                  .map((place) => {'placeName': place.toString()})
+                  .toList();
+        });
+        print('Recommendations: $recommendations');
+      } else {
+        print(
+            'Failed to fetch recommendations. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Error Encountered: $e");
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.locationName}'),
+        title: Text('${locationName}'),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Card(
-            color: Pallete.light,
-            child: Image.network(
-              imageUrl,
-              height: 180,
-              width: 250,
-              fit: BoxFit.cover,
-            ),
-          ),
-          Card(
-            color: Pallete.light,
-            child: Container(
-                height: 50,
-                child: Center(
-                    child: Text(
-                  widget.locationName,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                ))),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Card(
-            color: Pallete.light,
-            child: Container(
-              height: 30,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "City:",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    this.city,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 20),
-                  )
-                ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Card(
+                color: Pallete.light,
+                child: Image.network(
+                  imageUrl,
+                  height: 180,
+                  width: 250,
+                  fit: BoxFit.cover,
+                ),
               ),
-            ),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Card(
-            color: Pallete.light,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    _addToList();
-                  },
-                  style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.all(20),
-                      backgroundColor: Pallete.primary,
-                      // minimumSize: const Size(double.infinity, 0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        side: BorderSide(color: Pallete.primary, width: 2),
-                      )),
-                  child: Text(
-                    'Add to Bucket List',
-                    style: TextStyle(color: Pallete.whiteColor),
+              Card(
+                color: Pallete.light,
+                child: Container(
+                    height: 50,
+                    child: Center(
+                        child: Text(
+                      locationName,
+                      textAlign: TextAlign.center,
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                    ))),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Card(
+                color: Pallete.light,
+                child: Container(
+                  height: 30,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "City:",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        this.city,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 20),
+                      )
+                    ],
                   ),
                 ),
-                Row(
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Card(
+                color: Pallete.light,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    IconButton(
-                        onPressed: () {},
-                        icon: Icon(
-                          Icons.star,
-                          size: 30,
-                          color: Pallete.primary,
-                        )),
                     Padding(
-                        padding: EdgeInsetsDirectional.only(top: 10),
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          _addToList();
+                        },
+                        style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.all(20),
+                            backgroundColor: Pallete.primary,
+                            // minimumSize: const Size(double.infinity, 0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              side:
+                                  BorderSide(color: Pallete.primary, width: 2),
+                            )),
                         child: Text(
-                          rating.toString(),
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 18),
-                        ))
+                          'Add to Bucket List',
+                          style: TextStyle(color: Pallete.whiteColor),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 12.0),
+                      child: Row(
+                        children: [
+                          IconButton(
+                              onPressed: () {},
+                              icon: Icon(
+                                Icons.star,
+                                size: 30,
+                                color: Pallete.primary,
+                              )),
+                          Text(
+                            this.rating.toString(),
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 18),
+                          )
+                        ],
+                      ),
+                    ),
                   ],
                 ),
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Card(
-            color: Pallete.light,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  Align(
-                    alignment: Alignment.topLeft,
-                    child: Text(
-                      "Description:",
-                      textAlign: TextAlign.start,
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Card(
+                color: Pallete.light,
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          "Description:",
+                          textAlign: TextAlign.justify,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
+                      ),
+                      Text(this.description)
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+
+              // Recommendation carousel
+              Container(
+                child: Column(
+                  children: [
+                    Text(
+                      'Other places',
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                     ),
-                  ),
-                  Text(this.description)
-                ],
+                    SizedBox(
+                      height: 120, // Adjust the height as needed
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: recommendations.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return RecommendationCard(
+                              placeName: recommendations[index]['placeName']!,
+                              onTap: (selectedPlace) {
+                                setState(() {
+                                  locationName = selectedPlace;
+                                });
+                                fetchInfo(); // Fetch information for the new location
+                                getRecommendations(selectedPlace);
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
+            ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            foregroundColor: Pallete.whiteColor,
+            backgroundColor: Pallete.primary, // Text color
+            // padding: const EdgeInsets.all(20),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30.0),
+            ),
+            // elevation: 5,
+            //minimumSize: Size(double.infinity, 0), // Full width
+          ),
+          onPressed: () async {
+            double lat = location.first.latitude;
+            double long = location.first.longitude;
+            print("The lat long is $lat $long");
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => StreetViewPanoramaInitDemo(
+                          place: widget.locationName,
+                          lat: lat,
+                          long: long,
+                          rating: rating,
+                        )));
+          },
+          child: Container(
+            height: 60,
+            width: double.infinity,
+            alignment: Alignment.center,
+            child: Text(
+              'Street View',
+              style: TextStyle(color: Pallete.whiteColor),
             ),
           ),
-        ],
-      ),
-      bottomNavigationBar: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          foregroundColor: Pallete.whiteColor,
-          backgroundColor: Pallete.primary, // Text color
-          // padding: const EdgeInsets.all(20),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30.0),
-          ),
-          // elevation: 5,
-          //minimumSize: Size(double.infinity, 0), // Full width
         ),
-        onPressed: () async {
-          double lat = location.first.latitude;
-          double long = location.first.longitude;
-          print("The lat long is $lat $long");
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => StreetViewPanoramaInitDemo(
-                        place: widget.locationName,
-                        lat: lat,
-                        long: long,
-                        rating: rating,
-                      )));
-        },
+      ),
+    );
+  }
+}
+
+// RecommendationCard widget
+class RecommendationCard extends StatelessWidget {
+  // final String imageUrl;
+  final String placeName;
+  final Function(String) onTap;
+
+  RecommendationCard({required this.placeName, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        onTap(placeName);
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
         child: Container(
-          height: 60,
-          width: double.infinity,
-          alignment: Alignment.center,
-          child: Text(
-            'Street View',
-            style: TextStyle(color: Pallete.whiteColor),
+          width: 150,
+          child: Card(
+            color: Pallete.light,
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    placeName,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

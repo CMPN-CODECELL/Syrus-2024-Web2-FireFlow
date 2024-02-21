@@ -405,8 +405,10 @@ Description best desert of dubai    \n
                         Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) =>
-                                    TileListPage(prompt: prompt)));
+                                builder: (context) => TileListPage(
+                                      prompt: prompt,
+                                      userInput: userInput,
+                                    )));
                         // try {
                         //   // Call ChatGPT API to get itineraries
                         //   var response = await getRequest(prompt);

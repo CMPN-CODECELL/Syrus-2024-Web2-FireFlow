@@ -2,6 +2,7 @@ import 'package:client/colors/pallete.dart';
 import 'package:client/screens/favourites.dart';
 import 'package:client/screens/home.dart';
 import 'package:client/screens/planner.dart';
+import 'package:client/screens/plannerProPlus.dart';
 import 'package:client/screens/proPlanner.dart';
 import 'package:client/screens/profile.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
@@ -40,6 +41,7 @@ class _TabsScreenState extends State<TabsScreen>
     return Scaffold(
       body: TabBarView(
         controller: tabController,
+        // children: [Home(), Favourites(), Profile(), TripPlannerPro()],
         children: [Home(), Favourites(), Profile(), TripPlannerPro()],
       ),
       // backgroundColor: Color(0x00FFFFFF),
