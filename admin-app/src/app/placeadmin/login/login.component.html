@@ -1,1 +1,22 @@
-<p>login works!</p>
+<div
+  class="bg-success d-flex flex-column justify-content-center align-items-center"
+  style="height: 100vh; width: 98vw"
+>
+  <div class="bg-light text-center" style="height: 50vh; width: 30vw">
+    <form action="" class="form-group" [formGroup]="loginForm">
+      <h1 class="text-success">Login</h1>
+      <br />
+      <label for="">Email</label>
+      <br />
+      <input type="email" formControlName="email" />
+      <br />
+      <label for="">Password</label>
+      <br />
+      <input type="password" formControlName="password" />
+      <br />
+      <button type="button" class="btn btn-success" (click)="submit()">
+        Login
+      </button>
+    </form>
+  </div>
+</div>
