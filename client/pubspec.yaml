@@ -65,6 +65,7 @@ dependencies:
   simple_animations: ^5.0.2
   google_fonts: ^6.1.0
   flutter_gradient_animation_text: ^1.0.2
+  webview_flutter: ^4.7.0
   
 
 dev_dependencies:

@@ -40,7 +40,7 @@ class _TabsScreenState extends State<TabsScreen>
     return Scaffold(
       body: TabBarView(
         controller: tabController,
-        children: [Home(), Favourites(), Profile(), Planner()],
+        children: [Home(), Favourites(), Profile(), TripPlannerPro()],
       ),
       // backgroundColor: Color(0x00FFFFFF),
       bottomNavigationBar: CurvedNavigationBar(

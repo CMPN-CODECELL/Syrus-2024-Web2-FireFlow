@@ -1,4 +1,5 @@
 import 'package:client/colors/pallete.dart';
+import 'package:client/screens/placesCollection.dart';
 import 'package:flutter/material.dart';
 
 class CategoryCard extends StatelessWidget {
@@ -58,7 +59,10 @@ class PlaceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => PlaceCollection(place: placeName)));
+      },
       child: Container(
         margin: EdgeInsets.all(8),
         width: 150,

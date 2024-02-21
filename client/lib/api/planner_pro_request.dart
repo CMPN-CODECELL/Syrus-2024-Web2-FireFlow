@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-Future<String> _getRequest(String prompt) async {
+Future<String> getRequest(String prompt) async {
   var _response;
   final String apiUrl =
       'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GPTKey.GapiKey}';
